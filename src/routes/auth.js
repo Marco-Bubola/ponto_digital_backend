@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Company = require('../models/Company');
 const { auth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -12,7 +13,7 @@ const router = express.Router();
  */
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, cpf, companyId } = req.body;
+    const { name, email, password, cpf, role } = req.body;
 
     // Verificar se usuário já existe
     const existingUser = await User.findOne({ 
@@ -25,6 +26,26 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    // Buscar ou criar empresa padrão
+    let defaultCompany = await Company.findOne({ name: 'Empresa Padrão' });
+    
+    if (!defaultCompany) {
+      defaultCompany = new Company({
+        name: 'Empresa Padrão',
+        cnpj: '00000000000100',
+        email: 'empresa@pontodigital.com',
+        phone: '(11) 99999-9999',
+        address: {
+          street: 'Rua Padrão',
+          number: '100',
+          city: 'São Paulo',
+          state: 'SP',
+          zipCode: '00000-000'
+        }
+      });
+      await defaultCompany.save();
+    }
+
     // Hash da senha
     const saltRounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -35,7 +56,8 @@ router.post('/register', async (req, res) => {
       email,
       password: hashedPassword,
       cpf,
-      companyId
+      companyId: defaultCompany._id,
+      role: role || 'employee'
     });
 
     await user.save();
