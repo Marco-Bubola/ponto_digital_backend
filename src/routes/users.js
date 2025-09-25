@@ -94,3 +94,41 @@ router.post('/devices', auth, async (req, res) => {
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });
+
+/**
+ * GET /api/users/devices
+ * Listar dispositivos autorizados do usuário autenticado
+ */
+router.get('/devices', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+    res.json({ devices: user.authorizedDevices });
+  } catch (error) {
+    console.error('Erro ao listar dispositivos:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+/**
+ * DELETE /api/users/devices/:deviceId
+ * Remover dispositivo autorizado do usuário autenticado
+ */
+router.delete('/devices/:deviceId', auth, async (req, res) => {
+  try {
+    const { deviceId } = req.params;
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+
+    const before = user.authorizedDevices.length;
+    user.authorizedDevices = user.authorizedDevices.filter(d => d.deviceId !== deviceId);
+    if (user.authorizedDevices.length === before) {
+      return res.status(404).json({ error: 'Dispositivo não encontrado' });
+    }
+    await user.save();
+    res.json({ message: 'Dispositivo removido', deviceId });
+  } catch (error) {
+    console.error('Erro ao remover dispositivo:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
