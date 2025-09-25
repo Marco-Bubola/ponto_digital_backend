@@ -73,7 +73,7 @@ userSchema.methods.isDeviceAuthorized = function(deviceId) {
 
 // Método para adicionar dispositivo autorizado
 userSchema.methods.addAuthorizedDevice = function(deviceId, deviceName) {
-  const maxDevices = 3; // Baseado nas constantes do app
+  const maxDevices = 5; // Baseado nas constantes do app (aumentado para 5)
   
   if (this.authorizedDevices.length >= maxDevices) {
     throw new Error(`Máximo de ${maxDevices} dispositivos permitidos`);
