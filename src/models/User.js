@@ -42,8 +42,23 @@ const userSchema = new mongoose.Schema({
   }],
   role: {
     type: String,
-    enum: ['employee', 'manager', 'admin'],
+    enum: ['employee', 'manager', 'admin', 'hr'],
     default: 'employee'
+  },
+  department: {
+    type: String,
+    trim: true,
+    default: null
+  },
+  position: {
+    type: String,
+    trim: true,
+    default: null
+  },
+  phone: {
+    type: String,
+    trim: true,
+    default: null
   },
   isActive: {
     type: Boolean,
