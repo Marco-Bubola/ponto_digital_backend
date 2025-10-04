@@ -52,13 +52,21 @@ router.post('/', auth, deviceAuth, async (req, res) => {
 
 /**
  * GET /api/time-records
- * Listar registros de ponto do usuário
+ * Listar registros de ponto do usuário (ou de qualquer funcionário se for RH/Admin)
  */
 router.get('/', auth, async (req, res) => {
   try {
-    const { startDate, endDate, page = 1, limit = 50 } = req.query;
+    const { startDate, endDate, page = 1, limit = 50, userId } = req.query;
     
-    const query = { userId: req.userId };
+    // Se userId for fornecido e o usuário for RH/Admin, buscar registros do funcionário especificado
+    // Caso contrário, buscar apenas registros do próprio usuário logado
+    let targetUserId = req.userId;
+    
+    if (userId && (req.user.role === 'hr' || req.user.role === 'admin' || req.user.role === 'manager')) {
+      targetUserId = userId;
+    }
+    
+    const query = { userId: targetUserId };
     
     if (startDate && endDate) {
       query.timestamp = {
