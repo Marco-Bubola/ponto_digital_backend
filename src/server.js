@@ -10,6 +10,10 @@ const userRoutes = require('./routes/users');
 const timeRecordRoutes = require('./routes/timeRecords');
 const adjustmentRoutes = require('./routes/adjustments');
 const companyRoutes = require('./routes/companies');
+const employeeRoutes = require('./routes/employees');
+const statsRoutes = require('./routes/stats');
+const absenceRoutes = require('./routes/absences');
+const ticketRoutes = require('./routes/tickets');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,6 +44,10 @@ app.use('/api/users', userRoutes);
 app.use('/api/time-records', timeRecordRoutes);
 app.use('/api/adjustments', adjustmentRoutes);
 app.use('/api/companies', companyRoutes);
+app.use('/api/employees', employeeRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/absences', absenceRoutes);
+app.use('/api/tickets', ticketRoutes);
 
 // Rota de health check
 app.get('/health', (req, res) => {
