@@ -22,6 +22,13 @@ const companySchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  emailDomain: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true,
+    // Exemplo: empresa.com (sem @)
+  },
   address: {
     street: String,
     number: String,
