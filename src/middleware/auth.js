@@ -75,4 +75,31 @@ const adminAuth = async (req, res, next) => {
   }
 };
 
-module.exports = { auth, deviceAuth, adminAuth };
+/**
+ * Middleware para verificar roles específicas
+ * @param {Array} roles - Array de roles permitidas ['hr', 'admin', 'manager']
+ */
+const requireRole = (roles) => {
+  return async (req, res, next) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Autenticação necessária' });
+      }
+      
+      if (!roles.includes(req.user.role)) {
+        return res.status(403).json({ 
+          error: 'Acesso negado. Permissão insuficiente.',
+          requiredRoles: roles,
+          userRole: req.user.role
+        });
+      }
+      
+      next();
+    } catch (error) {
+      console.error('Erro na verificação de role:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  };
+};
+
+module.exports = { auth, deviceAuth, adminAuth, requireRole };
